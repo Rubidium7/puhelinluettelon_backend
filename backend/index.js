@@ -1,7 +1,9 @@
+require("dotenv").config();
 const express = require("express");
 const app = express();
 const cors = require("cors");
 var morgan = require("morgan");
+const Person = require("./models/person");
 
 morgan.token("post-data", function (req, res) {
 	if (req.method === "POST") {
@@ -20,7 +22,7 @@ app.use(
 	)
 );
 
-let persons = [
+let unused = [
 	{
 		id: "1",
 		name: "Arto Hellas",
@@ -48,30 +50,36 @@ app.get("/", (request, response) => {
 });
 
 app.get("/api/persons", (request, response) => {
-	response.json(persons);
+	Person.find({}).then((persons) => {
+		response.json(persons);
+	});
 });
 
 app.get("/api/info", (request, response) => {
-	response.send(`<p>Phonebook has info for ${persons.length} people</p>
+	Person.find({}).then((persons) => {
+		response.send(`<p>Phonebook has info for ${persons.length} people</p>
 		<p>${new Date(Date.now()).toString()}</p>`);
+	});
 });
 
 app.get("/api/persons/:id", (request, response) => {
-	const id = request.params.id;
-	const person = persons.find((person) => person.id === id);
-
-	if (person) {
-		response.json(person);
-	} else {
-		response.status(404).end();
-	}
+	Person.findById(request.params.id)
+		.then((person) => {
+			response.json(person);
+		})
+		.catch((error) => {
+			response.status(404).end();
+		});
 });
 
 app.delete("/api/persons/:id", (request, response) => {
-	const id = request.params.id;
-	persons = persons.filter((person) => person.id !== id);
-
-	response.status(204).end();
+	Person.findByIdAndDelete(request.params.id)
+		.then((person) => {
+			response.status(204).end();
+		})
+		.catch((error) => {
+			response.status(404).end();
+		});
 });
 
 app.post("/api/persons", (request, response) => {
@@ -89,24 +97,25 @@ app.post("/api/persons", (request, response) => {
 		});
 	}
 
-	if (persons.find((person) => person.name === body.name)) {
-		return response.status(400).json({
-			error: "name must be unique",
-		});
-	}
+	// i don't think this would work without being async
+	// Person.find({ name: body.name }).then((persons) => {
+	// 	console.log("HI", persons);
+	// 	return response.status(400).json({
+	// 		error: "name must be unique",
+	// 	});
+	// });
 
-	const person = {
-		id: String(Math.floor(Math.random() * 100000)),
+	const person = new Person({
 		name: body.name,
 		number: body.number,
-	};
+	});
 
-	persons = persons.concat(person);
-
-	response.json(person);
+	person.save().then((savedPerson) => {
+		response.json(savedPerson);
+	});
 });
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT;
 app.listen(PORT, () => {
 	console.log(`Server running on port ${PORT}`);
 });
