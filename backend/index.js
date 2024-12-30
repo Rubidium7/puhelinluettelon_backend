@@ -38,10 +38,6 @@ const errorHandler = (error, request, response, next) => {
 	next(error);
 };
 
-app.get("/", (request, response) => {
-	response.send("<h1>Do you liek persons?</h1>");
-});
-
 app.get("/api/persons", (request, response) => {
 	Person.find({}).then((persons) => {
 		response.json(persons);
