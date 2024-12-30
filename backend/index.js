@@ -65,10 +65,15 @@ app.get("/api/info", (request, response) => {
 app.get("/api/persons/:id", (request, response) => {
 	Person.findById(request.params.id)
 		.then((person) => {
-			response.json(person);
+			if (person) {
+				response.json(person);
+			} else {
+				response.status(404).end();
+			}
 		})
 		.catch((error) => {
-			response.status(404).end();
+			console.log(error);
+			response.status(400).send({ error: "malformatted id" });
 		});
 });
 
@@ -78,7 +83,8 @@ app.delete("/api/persons/:id", (request, response) => {
 			response.status(204).end();
 		})
 		.catch((error) => {
-			response.status(404).end();
+			console.log(error);
+			response.status(500).end();
 		});
 });
 
