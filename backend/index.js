@@ -13,7 +13,6 @@ morgan.token("post-data", function (req, res) {
 	}
 });
 
-app.use(express.static("dist"));
 app.use(cors());
 app.use(express.json());
 app.use(
@@ -21,6 +20,7 @@ app.use(
 		":method :url :status :res[content-length] - :response-time ms :post-data"
 	)
 );
+app.use(express.static("dist"));
 
 const unknownEndpoint = (request, response) => {
 	response.status(404).send({ error: "unknown endpoint" });
