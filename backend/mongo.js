@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-if (process.argv.length != 3 && process.argv.length != 5) {
+if (process.argv.length !== 3 && process.argv.length !== 5) {
 	console.log(
 		"Usage: node mongo.js <dbpassword> (optional: <name> <number>)"
 	);
@@ -20,7 +20,7 @@ mongoose.connect(url).then(() => {
 
 	const Person = mongoose.model("Person", personSchema);
 
-	if (process.argv.length == 3) {
+	if (process.argv.length === 3) {
 		Person.find({}).then((result) => {
 			if (result.length) console.log("phonebook:");
 			result.forEach((person) => {

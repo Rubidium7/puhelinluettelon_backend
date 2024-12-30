@@ -5,9 +5,9 @@ const cors = require("cors");
 var morgan = require("morgan");
 const Person = require("./models/person");
 
-morgan.token("post-data", function (req, res) {
-	if (req.method === "POST") {
-		return JSON.stringify(req.body);
+morgan.token("post-data", (request) => {
+	if (request.method === "POST") {
+		return JSON.stringify(request.body);
 	} else {
 		return " ";
 	}
@@ -65,7 +65,7 @@ app.get("/api/persons/:id", (request, response, next) => {
 
 app.delete("/api/persons/:id", (request, response, next) => {
 	Person.findByIdAndDelete(request.params.id)
-		.then((person) => {
+		.then(() => {
 			response.status(204).end();
 		})
 		.catch((error) => next(error));
@@ -113,7 +113,7 @@ app.put("/api/persons/:id", (request, response, next) => {
 	Person.findByIdAndUpdate(
 		request.params.id,
 		{ name, number },
-		{ new: true, runValidators: true, context: query }
+		{ new: true, runValidators: true, context: "query" }
 	)
 		.then((updatedPerson) => {
 			response.json(updatedPerson);

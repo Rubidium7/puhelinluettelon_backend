@@ -138,13 +138,31 @@ const App = () => {
 				dataService
 					.update(changedPerson.id, changedPerson)
 					.then((returnedPerson) => {
-						setPersons(
-							persons.map((person) =>
-								person.id !== returnedPerson.id
-									? person
-									: returnedPerson
-							)
-						);
+						try {
+							setPersons(
+								persons.map((person) =>
+									person.id !== returnedPerson.id
+										? person
+										: returnedPerson
+								)
+							);
+						} catch (error) {
+							setPersons(
+								persons.filter(
+									(person) => person.id !== changedPerson.id
+								)
+							);
+							setNewName("");
+							setNewNumber("");
+							setHappy(false);
+							setNotifMessage(
+								`Information of ${newName} has already been removed from server`
+							);
+							setTimeout(() => {
+								setNotifMessage(null);
+							}, 2500);
+							return;
+						}
 						setNewName("");
 						setNewNumber("");
 						setHappy(true);
@@ -154,19 +172,8 @@ const App = () => {
 						}, 2500);
 					})
 					.catch((error) => {
-						console.log(error);
-						console.log(error.response.data.error);
-						setPersons(
-							persons.filter(
-								(person) => person.id !== changedPerson.id
-							)
-						);
-						setNewName("");
-						setNewNumber("");
 						setHappy(false);
-						setNotifMessage(
-							`Information of ${newName} has already been removed from server`
-						);
+						setNotifMessage(`${error.response.data.error}`);
 						setTimeout(() => {
 							setNotifMessage(null);
 						}, 2500);
