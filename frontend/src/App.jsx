@@ -154,6 +154,8 @@ const App = () => {
 						}, 2500);
 					})
 					.catch((error) => {
+						console.log(error);
+						console.log(error.response.data.error);
 						setPersons(
 							persons.filter(
 								(person) => person.id !== changedPerson.id
@@ -172,16 +174,25 @@ const App = () => {
 			}
 		} else {
 			const personObject = { name: newName, number: newNumber };
-			dataService.create(personObject).then((newPerson) => {
-				setPersons(persons.concat(newPerson));
-				setNewName("");
-				setNewNumber("");
-				setHappy(true);
-				setNotifMessage(`Added ${newName}`);
-				setTimeout(() => {
-					setNotifMessage(null);
-				}, 2500);
-			});
+			dataService
+				.create(personObject)
+				.then((newPerson) => {
+					setPersons(persons.concat(newPerson));
+					setNewName("");
+					setNewNumber("");
+					setHappy(true);
+					setNotifMessage(`Added ${newName}`);
+					setTimeout(() => {
+						setNotifMessage(null);
+					}, 2500);
+				})
+				.catch((error) => {
+					setHappy(false);
+					setNotifMessage(`${error.response.data.error}`);
+					setTimeout(() => {
+						setNotifMessage(null);
+					}, 2500);
+				});
 		}
 	};
 
